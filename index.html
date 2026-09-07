@@ -123,7 +123,7 @@
   <p>The old porcelain is still down there — three sinks, a low tank, a tub on legs, white as bone in the beam. So is something else. Bring back two readings, name it, and get up the stairs before it decides you're staying.</p>
   <div class="keys">
     <b>WASD</b> move &nbsp; <b>Shift</b> run &nbsp; <b>Mouse</b> look<br>
-    <b>F</b> flashlight &nbsp; <b>1–4</b> equipment &nbsp; <b>E</b> use &nbsp; <b>J</b> journal
+    <b>F</b> flashlight &nbsp; <b>1–4</b> equipment &nbsp; <b>E</b> use &nbsp; <b>J</b> journal<br>Only the passage is lit. Step back into it to steady your nerve.
   </div>
   <button class="big" id="startBtn">Go down</button>
 </div>
@@ -131,7 +131,7 @@
 <div id="hud">
   <div id="cross"></div>
   <div id="prompt"></div>
-  <div id="objective">Find the cold room. Take a reading.</div>
+  <div id="objective">Hold the EMF reader and walk. 4 means you are in its room.</div>
   <div id="bars">
     <div>Battery</div><div class="bar" id="batbar"><i style="width:100%"></i></div>
     <div>Nerve</div><div class="bar" id="fearbar"><i style="width:0%"></i></div>
@@ -153,9 +153,9 @@
 <div id="journal">
   <div class="book">
     <h2>Field notes</h2>
-    <div class="sub">Two readings will narrow it down. Guess wrong and it keeps the house.</div>
+    <div class="sub">Two readings name the face. Guess wrong and it keeps the house.</div>
     <div id="evlist"></div>
-    <h3>What's down there</h3>
+    <h3>Which face it is wearing</h3>
     <div class="ghosts" id="glist"></div>
     <div class="close">Press J to close</div>
   </div>
@@ -180,7 +180,7 @@
 
 const CFG = {
   eye: 1.62, radius: 0.34, walk: 2.7, run: 4.3, ceil: 2.36, wallT: 0.2,
-  hunt: { speed: 2.15, dur: 22, catch: 0.85 }
+  hunt: { speed: 1.95, dur: 16, catch: 0.7 }
 };
 
 let scene, camera, renderer, clock, listener;
@@ -387,14 +387,15 @@ function ceilSlab(x1,z1,x2,z2){
   }
 }
 
-function bulb(x,z,y){
+function bulb(x,z,on,y){
+  on = on!==false;
   y=y||CFG.ceil-0.28;
   const g=new THREE.Group(); g.position.set(x,y,z); scene.add(g);
   cyl(0.012,0.012,0.24,MAT.iron,x,y+0.12,z);
   const b=mesh(new THREE.SphereGeometry(0.055,10,8),MAT.bulb,x,y,z,false,false);
   const L=new THREE.PointLight(0xffcf96,0.85,7.5,1.9);
   L.position.set(x,y,z); scene.add(L);
-  flickerLights.push({light:L,bulbMesh:b,base:0.85,on:true,phase:rnd(0,9)});
+  flickerLights.push({light:L,bulbMesh:b,base:0.85,on:on,def:on,phase:rnd(0,9)});
   return L;
 }
 function window_(x,y,z,w,h,ry){
@@ -527,7 +528,7 @@ function dressStorage(){
   box(0.7,0.45,0.5,MAT.bin,-3.9,0.68,-1.0);
   for(let i=0;i<4;i++) cyl(0.16,0.12,0.16,new THREE.MeshStandardMaterial({color:0xa9694a,roughness:.9}),
     -6.2,0.08+i*0.15,-5.9,12);
-  bulb(-5.5,-3.2);
+  bulb(-5.5,-3.2,false);
   colliders.push({minX:-3.6,maxX:-3.2,minZ:-6.4,maxZ:-1.0});
   colliders.push({minX:-7.9,maxX:-7.4,minZ:-6.2,maxZ:-2.2});
 }
@@ -567,7 +568,7 @@ function dressLaundry(){
   for(const sx of [2.3,3.5]) for(const sz of [-5.9,-5.3]) cyl(0.02,0.02,0.78,MAT.galv,sx,0.39,sz,8);
   box(0.6,0.22,0.3,MAT.iron,-2.2,0.11,-5.4);
   window_(-2.55,1.75,-6.35,0.8,0.5,0);
-  bulb(-0.4,-5.4); bulb(1.9,-2.2);
+  bulb(-0.4,-5.4,false); bulb(1.9,-2.2,false);
   colliders.push({minX:1.4,maxX:2.0,minZ:-5.7,maxZ:-5.1});
   colliders.push({minX:2.2,maxX:3.6,minZ:-6.0,maxZ:-5.2});
 }
@@ -587,7 +588,7 @@ function dressBoiler(){
   for(const sx of [4.8,6.4]) for(const sz of [-6.35,-5.85]) cyl(0.03,0.03,0.9,MAT.iron,sx,0.45,sz,8);
   for(let i=0;i<9;i++) box(rnd(.06,.18),rnd(.06,.2),rnd(.06,.14),
     pick([MAT.iron,MAT.card,MAT.galv]),rnd(4.9,6.3),1.0,rnd(-6.25,-5.95));
-  bulb(7.0,-2.6);
+  bulb(7.0,-2.6,false);
   colliders.push({minX:4.7,maxX:6.5,minZ:-6.4,maxZ:-5.8});
 }
 
@@ -640,7 +641,7 @@ function dressUtility(){
   const mat2=mesh(new THREE.PlaneGeometry(2.6,1.8),MAT.rug,-2.0,0.013,4.4,false,true);
   mat2.rotation.x=-Math.PI/2;
   window_(-2.0,1.85,7.43,0.75,0.42,0);
-  bulb(-2.2,5.6);
+  bulb(-2.2,5.6,false);
   hideSpots.push({minX:-5.0,maxX:-3.6,minZ:2.4,maxZ:3.4,label:'behind the shelves'});
 }
 
@@ -669,7 +670,7 @@ function dressCellar(){
   colliders.push({minX:8.1,maxX:9.5,minZ:3.0,maxZ:3.8});
   for(let i=0;i<3;i++) box(0.6,0.45,0.5,MAT.card,2.0,0.23+i*0.45,3.0);
   colliders.push({minX:1.7,maxX:2.3,minZ:2.7,maxZ:3.3});
-  bulb(5.0,4.4); bulb(8.4,6.0);
+  bulb(5.0,4.4,false); bulb(8.4,6.0,false);
   hideSpots.push({minX:8.0,maxX:9.6,minZ:4.0,maxZ:5.4,label:'behind the freezer'});
   // a black-and-white patterned rug at the threshold, from photo 4
   const rug=mesh(new THREE.PlaneGeometry(1.6,1.2),MAT.rugTan,5.5,0.013,2.6,false,true);
@@ -698,12 +699,12 @@ function runPipes(){
 
 /* ---------------------------------------------------------- ghost */
 const GHOSTS = [
-  {name:'Poltergeist', ev:['emf','orbs'],    tell:'throws what it finds'},
-  {name:'Wraith',      ev:['cold','voice'],  tell:'never touches the floor'},
-  {name:'Shade',       ev:['emf','cold'],    tell:'shy, until you are alone'},
-  {name:'Banshee',     ev:['voice','orbs'],  tell:'sings before it hunts'},
-  {name:'Revenant',    ev:['emf','voice'],   tell:'slow, then very fast'},
-  {name:'Phantom',     ev:['cold','orbs'],   tell:'watching from the dark'}
+  {name:'the Laundress', ev:['cold','voice'],  tell:'hums while the taps run'},
+  {name:'the Stoker',    ev:['emf','orbs'],    tell:'shovels in an empty cellar'},
+  {name:'the Tenant',    ev:['emf','cold'],    tell:'shy, until you are alone'},
+  {name:'the Bell',      ev:['voice','orbs'],  tell:'rings before it comes'},
+  {name:'the Long Man',  ev:['emf','voice'],   tell:'slow, then very fast'},
+  {name:'the Pale Guest',ev:['cold','orbs'],   tell:'watches from the dark'}
 ];
 const EVIDENCE = {
   emf:  {label:'EMF spike to 5', how:'Sweep the reader where it moves'},
@@ -717,7 +718,7 @@ let ghost = {
   type:null, home:null, obj:null, orbMesh:null,
   pos:new THREE.Vector3(), target:new THREE.Vector3(),
   activity:0, state:'dormant', visTimer:0, manifest:0,
-  huntTimer:0, huntCool:25, lastSeen:new THREE.Vector3(), lostTimer:0
+  huntTimer:0, huntCool:50, lastSeen:new THREE.Vector3(), lostTimer:0
 };
 
 function buildGhost(){
@@ -755,14 +756,14 @@ function ghostWander(){
 function updateGhost(dt){
   const g=ghost;
   const dToPlayer = g.pos.distanceTo(player.pos);
-  g.activity = clamp(g.activity + dt*(0.035 + (dToPlayer<6?0.05:0)) , 0, 1.4);
+  g.activity = clamp(g.activity + dt*(0.075 + (dToPlayer<7?0.06:0)) , 0, 1.4);
 
   if(g.state==='hunt'){
     g.huntTimer -= dt;
     const hidden = playerHidden();
     if(!hidden){ g.lastSeen.copy(player.pos); g.lostTimer=0; }
     else g.lostTimer += dt;
-    const aim = (hidden && g.lostTimer>2.2) ? g.target : g.lastSeen;
+    const aim = (hidden && g.lostTimer>1.5) ? g.target : g.lastSeen;
     const dir = new THREE.Vector3(aim.x-g.pos.x,0,aim.z-g.pos.z);
     if(dir.length()<0.5 && hidden) ghostWander();
     dir.normalize();
@@ -814,8 +815,8 @@ function startHunt(){
   document.getElementById('bloodwash').style.opacity='0.85';
 }
 function endHunt(){
-  ghost.state='roam'; ghost.huntCool=40; player.fear=0.35;
-  flickerLights.forEach(f=>f.on=true);
+  ghost.state='roam'; ghost.huntCool=55; player.fear=0.35;
+  flickerLights.forEach(f=>f.on=f.def);
   torch.intensity = torchOn? 2.2:0;
   document.getElementById('bloodwash').style.opacity='0';
   say('It let go.',2.5);
@@ -1054,15 +1055,15 @@ function readout(){
   let big='—', extra='', cls='';
   if(tool===0){ // EMF
     let lvl=1;
-    if(d<7) lvl=2; if(d<4.5) lvl=3; if(d<2.6) lvl=4;
-    if(d<2.6 && ghost.type.ev.includes('emf') && ghost.activity>0.35) lvl=5;
-    big=lvl; extra=lvl>=4?'strong field':'background';
+    if(d<9) lvl=2; if(d<6) lvl=3; if(d<4) lvl=4;
+    if(d<4 && ghost.type.ev.includes('emf') && ghost.activity>0.15) lvl=5;
+    big=lvl; extra = lvl>=4?'very close':(lvl===3?'warm — keep going':'background');
     if(lvl>=4 && Math.random()<0.25) audio.emf(lvl);
     if(lvl===5) gotEvidence('emf');
   } else if(tool===1){ // thermometer
     let temp = 11.5 - clamp((8-d),0,8)*0.9;
     if(playerRoom()===ghost.home) temp-=3.2;
-    if(ghost.type.ev.includes('cold') && playerRoom()===ghost.home && d<5) temp = -rnd(0.5,4.5);
+    if(ghost.type.ev.includes('cold') && playerRoom()===ghost.home) temp = -rnd(0.5,4.5);
     big=temp.toFixed(1)+'°';
     cls = temp<0?'cold':'';
     extra = temp<0?'freezing':(temp<6?'cold spot':'ambient');
@@ -1082,8 +1083,8 @@ function useTool(){
   const d=dGhost();
   if(tool===2){
     audio.static(0.18);
-    const dark = !torchOn && lightLevelHere()<0.25;
-    if(playerRoom()===ghost.home && d<6 && dark && ghost.type.ev.includes('voice')){
+    const dark = !torchOn && lightLevelHere()<0.45;
+    if(playerRoom()===ghost.home && d<10 && dark && ghost.type.ev.includes('voice')){
       setTimeout(()=>{ say('"'+pick(REPLIES)+'"',3.5); audio.static(0.3); gotEvidence('voice'); player.fear=Math.min(1,player.fear+0.12); },700);
     } else {
       setTimeout(()=>say(dark?'Static. Nothing answers.':'Too much light. Kill the lamp.',2.4),600);
@@ -1093,8 +1094,8 @@ function useTool(){
     f.style.transition='none'; f.style.opacity='0.9';
     requestAnimationFrame(()=>{ f.style.transition='opacity .35s'; f.style.opacity='0'; });
     audio.shutter();
-    const inView = isInView(new THREE.Vector3(ghost.pos.x,1.2,ghost.pos.z)) && d<9;
-    if(inView && ghost.type.ev.includes('orbs') && ghost.activity>0.3){
+    const inView = isInView(new THREE.Vector3(ghost.pos.x,1.2,ghost.pos.z)) && d<13;
+    if(inView && ghost.type.ev.includes('orbs') && ghost.activity>0.15){
       ghost.orbMesh.position.set(ghost.pos.x,rnd(0.8,1.7),ghost.pos.z);
       ghost.orbMesh.material.opacity=1;
       setTimeout(()=>ghost.orbMesh.material.opacity=0,900);
@@ -1107,16 +1108,16 @@ function useTool(){
 }
 function isInView(p){
   const v=p.clone().project(camera);
-  return v.z<1 && Math.abs(v.x)<0.7 && Math.abs(v.y)<0.7;
+  return v.z<1 && Math.abs(v.x)<0.9 && Math.abs(v.y)<0.9;
 }
 function lightLevelHere(){
   let l=0.08;
   flickerLights.forEach(f=>{
     if(!f.on) return;
     const d=Math.hypot(f.light.position.x-player.pos.x,f.light.position.z-player.pos.z);
-    if(d<7) l += (1-d/7)*0.45;
+    if(d<7) l = Math.max(l, 0.08+(1-d/7)*0.62);
   });
-  if(player.pos.x>8.5) l+=0.3;
+  if(player.pos.x>10) l=Math.max(l,0.45);   // daylight down the stairwell
   return l;
 }
 function gotEvidence(k){
@@ -1177,11 +1178,11 @@ function escape_(){
   const found=Object.keys(state.evidence).length;
   audio.win();
   if(state.guess && state.guess===ghost.type && found>=2)
-    showEnd('You were right.','A '+ghost.type.name+', exactly as logged. You shut the door on it with two readings and a name, which is more than most people manage.');
+    showEnd('You were right.',ghost.type.name[0].toUpperCase()+ghost.type.name.slice(1)+', exactly as logged. You shut the door on it with two readings and a name, which is more than most people manage.');
   else if(state.guess)
-    showEnd('You got out.','You wrote down '+state.guess.name+'. It was a '+ghost.type.name+' — '+ghost.type.tell+'. The house keeps it, and someone else will come down eventually.');
+    showEnd('You got out.','You wrote down '+state.guess.name+'. It was '+ghost.type.name+' — '+ghost.type.tell+'. The house keeps it, and someone else will come down eventually.');
   else
-    showEnd('You got out.','No name in the book. It was a '+ghost.type.name+', living in '+ROOMS[ghost.home].name+', and it is still there.');
+    showEnd('You got out.','No name in the book. It was '+ghost.type.name+', living in '+ROOMS[ghost.home].name+', and it is still there.');
 }
 
 /* ---------------------------------------------------------- loop */
@@ -1220,16 +1221,16 @@ function animate(){
     player.pos.y = groundY(player.pos.x,player.pos.z) + CFG.eye + player.bob;
 
     // battery
-    if(torchOn){ battery=clamp(battery-dt*0.0085,0,1); if(battery<=0){torchOn=false;torch.intensity=0;say('The lamp is dead.',3);} }
+    if(torchOn){ battery=clamp(battery-dt*0.006,0,1); if(battery<=0){torchOn=false;torch.intensity=0;say('The lamp is dead.',3);} }
     torch.intensity = torchOn ? (2.2*(0.35+0.65*battery)) * (0.94+Math.sin(now*23)*0.06) : 0;
 
     // fear
     const light=lightLevelHere();
     const near=dGhost();
-    let df = (light<0.25? 0.030 : -0.045);
-    if(!torchOn && light<0.25) df += 0.02;
-    if(near<3.5) df += 0.075;
-    if(ghost.manifest>0 && near<7) df += 0.05;
+    let df = (light<0.25? 0.020 : -0.065);
+    if(!torchOn && light<0.25) df += 0.012;
+    if(near<3.5) df += 0.045;
+    if(ghost.manifest>0 && near<7) df += 0.03;
     if(ghost.state==='hunt') df += 0.02;
     player.fear = clamp(player.fear + df*dt,0,1);
 
@@ -1283,7 +1284,7 @@ document.getElementById('startBtn').onclick=()=>{
   state.started=true;
   setupTouch();
   if(!isTouch) lockNow();
-  say(ROOMS[ghost.home]? 'The dehumidifier is running somewhere.' : '',3);
+  say('Start with the reader. Walk every room until the number hits 4.',5);
 };
 init();
 document.addEventListener('click',()=>{ if(state.started&&!journalOpen&&!state.over&&!isTouch&&!locked) lockNow(); });
