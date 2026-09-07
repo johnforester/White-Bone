@@ -8,10 +8,9 @@
   :root{
     --sodium:#e8b070;      /* the bare-bulb light down here */
     --sodium-dim:#8a6742;
-    --paper:#ded6c4;       /* journal stock */
+    --paper:#ded6c4;       /* card stock */
     --ink:#2a2620;
     --rust:#a4482e;
-    --cold:#7fa8b8;
     --black:#08070a;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -42,19 +41,13 @@
   #prompt{position:absolute;left:50%;top:calc(50% + 26px);transform:translateX(-50%);
     font-size:13px;color:#e8e0d0cc;text-shadow:0 1px 3px #000;white-space:nowrap}
 
-  #tools{position:absolute;left:16px;bottom:16px;display:flex;gap:6px}
-  .tool{width:44px;height:44px;border:1px solid #ffffff22;background:#0c0b0ea8;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    font-size:9px;color:#8f8779;gap:2px;pointer-events:auto;cursor:pointer}
-  .tool .n{font-size:11px;color:#5f594e}
-  .tool.on{border-color:var(--sodium);color:var(--sodium)}
-  .tool.on .n{color:var(--sodium-dim)}
-
   #readout{position:absolute;right:16px;bottom:16px;min-width:150px;padding:10px 12px;
     background:#0c0b0ec9;border:1px solid #ffffff1a;font-size:12px;line-height:1.55;color:#c9c0ae}
   #readout .big{font-family:Georgia,serif;font-size:26px;line-height:1.1;color:var(--sodium)}
-  #readout .cold{color:var(--cold)}
+  #readout .hot{color:#f0d0a0}
   #readout .lbl{color:#79705f;font-size:10px}
+  #readout .shots{margin-top:6px;padding-top:6px;border-top:1px solid #ffffff1a;
+    font-family:Georgia,serif;font-size:15px;color:var(--paper)}
 
   #bars{position:absolute;left:16px;top:16px;width:120px;font-size:10px;color:#79705f}
   .bar{height:4px;background:#ffffff18;margin:3px 0 9px}
@@ -74,30 +67,6 @@
   #bloodwash{position:fixed;inset:0;pointer-events:none;z-index:16;opacity:0;
     background:radial-gradient(ellipse at center,transparent 30%,#3b0a06 100%);transition:opacity .6s}
 
-  /* ---------- journal ---------- */
-  #journal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
-    background:#000000bb;padding:20px}
-  .book{width:min(520px,100%);max-height:88vh;overflow:auto;background:var(--paper);color:var(--ink);
-    padding:26px 26px 20px;box-shadow:0 30px 80px #000c;
-    font-family:Georgia,"Iowan Old Style",serif}
-  .book h2{font-size:24px;font-weight:400;margin-bottom:2px}
-  .book .sub{font-size:12px;color:#6d6455;font-family:ui-sans-serif,sans-serif;margin-bottom:18px}
-  .ev{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #0002;font-size:15px}
-  .ev .dot{width:11px;height:11px;border:1px solid #0006;flex:none}
-  .ev.got .dot{background:var(--rust);border-color:var(--rust)}
-  .ev.got{font-weight:600}
-  .ev small{margin-left:auto;font-family:ui-sans-serif,sans-serif;font-size:11px;color:#6d6455}
-  .book h3{font-size:13px;font-family:ui-sans-serif,sans-serif;color:#6d6455;margin:20px 0 8px;font-weight:600}
-  .ghosts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .g{padding:9px 10px;border:1px solid #0003;background:#0000000a;cursor:pointer;
-    font-size:14px;text-align:left;color:var(--ink);font-family:Georgia,serif}
-  .g small{display:block;font-family:ui-sans-serif,sans-serif;font-size:10px;color:#6d6455;margin-top:2px}
-  .g:hover{background:#0000001a}
-  .g.sel{background:var(--ink);color:var(--paper)}
-  .g.sel small{color:#b9b0a0}
-  .g.dim{opacity:.4}
-  .book .close{margin-top:16px;font-family:ui-sans-serif,sans-serif;font-size:12px;color:#6d6455;text-align:center}
-
   /* ---------- end card ---------- */
   #end{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;
     justify-content:center;align-items:center;text-align:center;padding:30px;background:#05040699}
@@ -112,18 +81,17 @@
   .tbtn{position:fixed;right:20px;width:60px;height:60px;border-radius:50%;border:1px solid #ffffff20;
     background:#0c0b0eb0;color:#b9b0a0;font-size:11px;z-index:25;display:none;
     align-items:center;justify-content:center;text-align:center;line-height:1.2}
-  #tUse{bottom:150px}#tLight{bottom:80px}#tJournal{bottom:220px;font-size:10px}
-  @media (pointer:coarse){#tools{bottom:16px;left:50%;transform:translateX(-50%)}}
+  #tUse{bottom:150px}#tLight{bottom:80px}
 </style>
 </head>
 <body>
 
 <div id="title">
   <h1>White <em>Bone</em></h1>
-  <p>The old porcelain is still down there — three sinks, a low tank, a tub on legs, white as bone in the beam. So is something else. Bring back two readings, name it, and get up the stairs before it decides you're staying.</p>
+  <p>The old porcelain is still down there — three sinks, a low tank, a tub on legs, white as bone in the beam. So is something else. Find it in the dark, get three photographs of it, and be up the stairs before it decides you're staying.</p>
   <div class="keys">
     <b>WASD</b> move &nbsp; <b>Shift</b> run &nbsp; <b>Mouse</b> look<br>
-    <b>F</b> flashlight &nbsp; <b>1–4</b> equipment &nbsp; <b>E</b> use &nbsp; <b>J</b> journal<br>Only the passage is lit. Step back into it to steady your nerve.
+    <b>F</b> flashlight &nbsp; <b>E</b> or <b>click</b> shoot<br>Only the passage is lit. Step back into it to steady your nerve.
   </div>
   <button class="big" id="startBtn">Go down</button>
 </div>
@@ -131,13 +99,12 @@
 <div id="hud">
   <div id="cross"></div>
   <div id="prompt"></div>
-  <div id="objective">Hold the EMF reader and walk. 4 means you are in its room.</div>
+  <div id="objective">Walk the rooms. The camera's signal climbs as you close on it.</div>
   <div id="bars">
     <div>Battery</div><div class="bar" id="batbar"><i style="width:100%"></i></div>
     <div>Nerve</div><div class="bar" id="fearbar"><i style="width:0%"></i></div>
   </div>
-  <div id="tools"></div>
-  <div id="readout"><div class="lbl">Equipment</div><div class="big">—</div></div>
+  <div id="readout"><div class="lbl">Camera &middot; signal</div><div class="big">—</div></div>
   <div id="whisper"></div>
 </div>
 
@@ -146,20 +113,8 @@
 <div id="flash"></div>
 
 <div id="stick"><i></i></div>
-<div class="tbtn" id="tUse">USE</div>
+<div class="tbtn" id="tUse">SHOOT</div>
 <div class="tbtn" id="tLight">LAMP</div>
-<div class="tbtn" id="tJournal">JOURNAL</div>
-
-<div id="journal">
-  <div class="book">
-    <h2>Field notes</h2>
-    <div class="sub">Two readings name the face. Guess wrong and it keeps the house.</div>
-    <div id="evlist"></div>
-    <h3>Which face it is wearing</h3>
-    <div class="ghosts" id="glist"></div>
-    <div class="close">Press J to close</div>
-  </div>
-</div>
 
 <div id="end">
   <h2 id="endTitle"></h2>
@@ -699,23 +654,18 @@ function runPipes(){
 
 /* ---------------------------------------------------------- ghost */
 const GHOSTS = [
-  {name:'the Laundress', ev:['cold','voice'],  tell:'hums while the taps run'},
-  {name:'the Stoker',    ev:['emf','orbs'],    tell:'shovels in an empty cellar'},
-  {name:'the Tenant',    ev:['emf','cold'],    tell:'shy, until you are alone'},
-  {name:'the Bell',      ev:['voice','orbs'],  tell:'rings before it comes'},
-  {name:'the Long Man',  ev:['emf','voice'],   tell:'slow, then very fast'},
-  {name:'the Pale Guest',ev:['cold','orbs'],   tell:'watches from the dark'}
+  {name:'the Laundress',  tell:'hums while the taps run'},
+  {name:'the Stoker',     tell:'shovels in an empty cellar'},
+  {name:'the Tenant',     tell:'shy, until you are alone'},
+  {name:'the Bell',       tell:'rings before it comes'},
+  {name:'the Long Man',   tell:'slow, then very fast'},
+  {name:'the Pale Guest', tell:'watches from the dark'}
 ];
-const EVIDENCE = {
-  emf:  {label:'EMF spike to 5', how:'Sweep the reader where it moves'},
-  cold: {label:'Freezing temperature', how:'Thermometer below zero in its room'},
-  voice:{label:'Spirit box answer', how:'Ask in the dark, in its room'},
-  orbs: {label:'Orbs on film', how:'Photograph the room when it is active'}
-};
+const PHOTO_GOAL = 3;
 
 const hideSpots=[];
 let ghost = {
-  type:null, home:null, obj:null, orbMesh:null,
+  type:null, home:null, obj:null,
   pos:new THREE.Vector3(), target:new THREE.Vector3(),
   activity:0, state:'dormant', visTimer:0, manifest:0,
   huntTimer:0, huntCool:50, lastSeen:new THREE.Vector3(), lostTimer:0
@@ -739,9 +689,6 @@ function buildGhost(){
   const arms2=arms.clone(); arms2.position.x=-0.22; arms2.rotation.z=-0.12; g.add(arms2);
   scene.add(g); ghost.obj=g;
 
-  const orbMat=new THREE.MeshBasicMaterial({color:0xdff0ff,transparent:true,opacity:0,depthWrite:false});
-  ghost.orbMesh=new THREE.Mesh(new THREE.SphereGeometry(0.05,8,6),orbMat);
-  scene.add(ghost.orbMesh);
   ghost.light=new THREE.PointLight(0x7ea6c4,0,4,2); scene.add(ghost.light);
 
   const c=roomCenter(ghost.home); ghost.pos.copy(c); ghost.target.copy(c);
@@ -832,14 +779,8 @@ const player = {
   pos:new THREE.Vector3(-5.5,CFG.eye,-1.2), vel:new THREE.Vector3(),
   yaw:Math.PI*0.5, pitch:0, speed:0, stamina:1, fear:0, bob:0
 };
-const state = {evidence:{}, guess:null, over:false, escaped:false, started:false};
-let torchOn=true, battery=1.0, tool=0, now=0;
-const TOOLS=[
-  {k:'1',n:'EMF',  d:'Reader'},
-  {k:'2',n:'Temp', d:'Thermometer'},
-  {k:'3',n:'Box',  d:'Spirit box'},
-  {k:'4',n:'Cam',  d:'Camera'}
-];
+const state = {shots:0, best:99, over:false, escaped:false, started:false};
+let torchOn=true, battery=1.0, now=0, shotCool=0;
 
 function groundY(x,z){
   if(x>10.05 && z>0 && z<2){ return clamp((x-10.05)/1.55,0,1)*2.34; }
@@ -950,7 +891,7 @@ function init(){
   hideSpots.push({minX:10.1,maxX:11.6,minZ:0.2,maxZ:1.8,label:'under the stairs'});
 
   clock=new THREE.Clock();
-  buildHUD(); buildJournal();
+  readout();
   addEventListener('resize',onResize);
   animate();
 }
@@ -966,10 +907,7 @@ addEventListener('keydown',e=>{
   keys[e.code]=true;
   if(!state.started) return;
   if(e.code==='KeyF') toggleTorch();
-  if(e.code==='KeyJ') toggleJournal();
-  if(e.code==='KeyE') useTool();
-  if(/^Digit[1-4]$/.test(e.code)) setTool(+e.code.slice(5)-1);
-  if(e.code==='Escape') closeJournal();
+  if(e.code==='KeyE'||e.code==='Space'){ e.preventDefault(); shoot(); }
 });
 addEventListener('keyup',e=>keys[e.code]=false);
 
@@ -987,7 +925,7 @@ let stickVec={x:0,y:0}, stickId=null, lookId=null, lookLast={x:0,y:0};
 function setupTouch(){
   if(!isTouch) return;
   document.getElementById('stick').style.display='block';
-  ['tUse','tLight','tJournal'].forEach(id=>document.getElementById(id).style.display='flex');
+  ['tUse','tLight'].forEach(id=>document.getElementById(id).style.display='flex');
   const st=document.getElementById('stick'), knob=st.querySelector('i');
   st.addEventListener('touchstart',e=>{stickId=e.changedTouches[0].identifier;e.preventDefault();},{passive:false});
   addEventListener('touchmove',e=>{
@@ -1017,23 +955,11 @@ function setupTouch(){
       if(t.identifier===lookId) lookId=null;
     }
   });
-  document.getElementById('tUse').onclick=useTool;
+  document.getElementById('tUse').onclick=shoot;
   document.getElementById('tLight').onclick=toggleTorch;
-  document.getElementById('tJournal').onclick=toggleJournal;
 }
 
 /* ---------------------------------------------------------- HUD */
-function buildHUD(){
-  const t=document.getElementById('tools');
-  TOOLS.forEach((x,i)=>{
-    const d=document.createElement('div'); d.className='tool'; d.id='tool'+i;
-    d.innerHTML='<span class="n">'+x.k+'</span>'+x.n;
-    d.onclick=()=>setTool(i);
-    t.appendChild(d);
-  });
-  setTool(0);
-}
-function setTool(i){ tool=i; TOOLS.forEach((x,j)=>document.getElementById('tool'+j).classList.toggle('on',j===i)); audio.click(); }
 function toggleTorch(){
   if(battery<=0) return;
   torchOn=!torchOn; torch.intensity = torchOn?2.2:0; audio.click();
@@ -1044,68 +970,63 @@ function say(t,dur){
   w.textContent=t; w.style.opacity='1'; sayTimer=dur||3;
 }
 
-/* ---------------------------------------------------------- tools */
+/* ---------------------------------------------------------- camera */
 function ghostRoomNow(){ return roomAt(ghost.pos.x,ghost.pos.z); }
 function playerRoom(){ return roomAt(player.pos.x,player.pos.z); }
 function dGhost(){ return player.pos.distanceTo(new THREE.Vector3(ghost.pos.x,player.pos.y,ghost.pos.z)); }
+function ghostFramed(d){ return d<9 && isInView(new THREE.Vector3(ghost.pos.x,1.2,ghost.pos.z)); }
 
 function readout(){
   const el=document.getElementById('readout'); const d=dGhost();
-  const t=TOOLS[tool];
-  let big='—', extra='', cls='';
-  if(tool===0){ // EMF
-    let lvl=1;
-    if(d<9) lvl=2; if(d<6) lvl=3; if(d<4) lvl=4;
-    if(d<4 && ghost.type.ev.includes('emf') && ghost.activity>0.15) lvl=5;
-    big=lvl; extra = lvl>=4?'very close':(lvl===3?'warm — keep going':'background');
-    if(lvl>=4 && Math.random()<0.25) audio.emf(lvl);
-    if(lvl===5) gotEvidence('emf');
-  } else if(tool===1){ // thermometer
-    let temp = 11.5 - clamp((8-d),0,8)*0.9;
-    if(playerRoom()===ghost.home) temp-=3.2;
-    if(ghost.type.ev.includes('cold') && playerRoom()===ghost.home) temp = -rnd(0.5,4.5);
-    big=temp.toFixed(1)+'°';
-    cls = temp<0?'cold':'';
-    extra = temp<0?'freezing':(temp<6?'cold spot':'ambient');
-    if(temp<0) gotEvidence('cold');
-  } else if(tool===2){ // spirit box
-    big='SCAN'; extra='press E to speak';
-  } else if(tool===3){ // camera
-    big='◉'; extra='press E to shoot';
-  }
-  el.innerHTML='<div class="lbl">'+t.d+'</div><div class="big '+cls+'">'+big+'</div><div class="lbl">'+extra+'</div>';
+  let sig=1;
+  if(d<12) sig=2; if(d<8) sig=3; if(d<5) sig=4; if(d<3) sig=5;
+  const framed=ghostFramed(d);
+  let extra = sig>=5?'it is right here':(sig===4?'very close':(sig===3?'somewhere near':'faint'));
+  if(framed) extra='something in frame';
+  if(sig>=4 && Math.random()<0.25) audio.emf(sig);
+  el.innerHTML='<div class="lbl">Camera &middot; signal</div>'+
+    '<div class="big'+(framed?' hot':'')+'">'+sig+'</div>'+
+    '<div class="lbl">'+extra+'</div>'+
+    '<div class="shots">'+state.shots+' / '+PHOTO_GOAL+' <span class="lbl">on film</span></div>';
 }
 
-const REPLIES=['behind you','cold','mother','get out','nine','still here','no','my house','down','hungry'];
-function useTool(){
+function shoot(){
   if(state.over) return;
   audio.init();
+  if(shotCool>0){ say('Winding the film on.',1.2); return; }
+  shotCool=1.1;
+
+  const f=document.getElementById('flash');
+  f.style.transition='none'; f.style.opacity='0.9';
+  requestAnimationFrame(()=>{ f.style.transition='opacity .35s'; f.style.opacity='0'; });
+  audio.shutter();
+
   const d=dGhost();
-  if(tool===2){
-    audio.static(0.18);
-    const dark = !torchOn && lightLevelHere()<0.45;
-    if(playerRoom()===ghost.home && d<10 && dark && ghost.type.ev.includes('voice')){
-      setTimeout(()=>{ say('"'+pick(REPLIES)+'"',3.5); audio.static(0.3); gotEvidence('voice'); player.fear=Math.min(1,player.fear+0.12); },700);
-    } else {
-      setTimeout(()=>say(dark?'Static. Nothing answers.':'Too much light. Kill the lamp.',2.4),600);
-    }
-  } else if(tool===3){
-    const f=document.getElementById('flash');
-    f.style.transition='none'; f.style.opacity='0.9';
-    requestAnimationFrame(()=>{ f.style.transition='opacity .35s'; f.style.opacity='0'; });
-    audio.shutter();
-    const inView = isInView(new THREE.Vector3(ghost.pos.x,1.2,ghost.pos.z)) && d<13;
-    if(inView && ghost.type.ev.includes('orbs') && ghost.activity>0.15){
-      ghost.orbMesh.position.set(ghost.pos.x,rnd(0.8,1.7),ghost.pos.z);
-      ghost.orbMesh.material.opacity=1;
-      setTimeout(()=>ghost.orbMesh.material.opacity=0,900);
-      say('Orbs on the film.',3); gotEvidence('orbs');
-    } else if(inView){ say('It was in frame. Nothing showed.',2.6); }
-    else say('Nothing in frame.',2);
-  } else {
-    say('Hold it up and walk. Watch the numbers.',2.2);
+  if(!ghostFramed(d) || d>13){
+    say(d<6?'Nothing in frame. It is close, though.':'Nothing in frame.',2);
+    return;
   }
+
+  // the flash catches what the eye could not
+  ghost.skin.opacity=0.9;
+  ghost.manifest=Math.max(ghost.manifest,0.6);
+  ghost.light.intensity=Math.max(ghost.light.intensity,0.8);
+  ghost.activity=clamp(ghost.activity+0.25,0,1.4);
+  player.fear=clamp(player.fear+0.10,0,1);
+
+  state.shots++;
+  state.best=Math.min(state.best,d);
+  audio.emf(3);
+  say(d<3 ? 'It filled the frame. Do not look at the print too long.'
+     : d<7 ? 'Caught it clean — a shape where nothing was standing.'
+           : 'A pale smear at the back of the room. It counts.', 3.2);
+  readout();
+  document.getElementById('objective').textContent =
+    state.shots>=PHOTO_GOAL
+      ? 'Three on film. Take the stairs east while you still can.'
+      : (PHOTO_GOAL-state.shots)+' more photograph'+(PHOTO_GOAL-state.shots===1?'':'s')+' and you can go up.';
 }
+
 function isInView(p){
   const v=p.clone().project(camera);
   return v.z<1 && Math.abs(v.x)<0.9 && Math.abs(v.y)<0.9;
@@ -1120,50 +1041,6 @@ function lightLevelHere(){
   if(player.pos.x>10) l=Math.max(l,0.45);   // daylight down the stairwell
   return l;
 }
-function gotEvidence(k){
-  if(state.evidence[k]) return;
-  state.evidence[k]=true; audio.emf(3);
-  say('Logged: '+EVIDENCE[k].label,3.5);
-  refreshJournal();
-  const n=Object.keys(state.evidence).length;
-  document.getElementById('objective').textContent =
-    n>=2 ? 'Two readings. Name it in the journal, then take the stairs east.'
-         : 'One reading down. Find the second.';
-}
-
-/* ---------------------------------------------------------- journal */
-function buildJournal(){
-  const ev=document.getElementById('evlist');
-  ev.innerHTML=Object.keys(EVIDENCE).map(k=>
-    '<div class="ev" id="ev_'+k+'"><span class="dot"></span>'+EVIDENCE[k].label+
-    '<small>'+EVIDENCE[k].how+'</small></div>').join('');
-  const gl=document.getElementById('glist');
-  gl.innerHTML=GHOSTS.map((g,i)=>
-    '<div class="g" id="g_'+i+'">'+g.name+'<small>'+g.ev.map(e=>EVIDENCE[e].label.split(' ')[0]).join(' + ')+
-    ' · '+g.tell+'</small></div>').join('');
-  GHOSTS.forEach((g,i)=>document.getElementById('g_'+i).onclick=()=>{
-    state.guess=g; refreshJournal(); audio.click();
-    document.getElementById('objective').textContent='Named it a '+g.name+'. Now get up the stairs.';
-  });
-}
-function refreshJournal(){
-  Object.keys(EVIDENCE).forEach(k=>
-    document.getElementById('ev_'+k).classList.toggle('got',!!state.evidence[k]));
-  const found=Object.keys(state.evidence);
-  GHOSTS.forEach((g,i)=>{
-    const el=document.getElementById('g_'+i);
-    el.classList.toggle('sel',state.guess===g);
-    el.classList.toggle('dim',found.length>0 && !found.every(f=>g.ev.includes(f)));
-  });
-}
-let journalOpen=false;
-function toggleJournal(){
-  journalOpen=!journalOpen;
-  document.getElementById('journal').style.display=journalOpen?'flex':'none';
-  if(journalOpen){ document.exitPointerLock&&document.exitPointerLock(); refreshJournal(); }
-  else if(!isTouch) lockNow();
-}
-function closeJournal(){ if(journalOpen) toggleJournal(); }
 
 /* ---------------------------------------------------------- end */
 function showEnd(t,b){
@@ -1175,14 +1052,16 @@ function escape_(){
   if(state.escaped||state.over) return;
   state.escaped=true; state.over=true;
   document.exitPointerLock&&document.exitPointerLock();
-  const found=Object.keys(state.evidence).length;
   audio.win();
-  if(state.guess && state.guess===ghost.type && found>=2)
-    showEnd('You were right.',ghost.type.name[0].toUpperCase()+ghost.type.name.slice(1)+', exactly as logged. You shut the door on it with two readings and a name, which is more than most people manage.');
-  else if(state.guess)
-    showEnd('You got out.','You wrote down '+state.guess.name+'. It was '+ghost.type.name+' — '+ghost.type.tell+'. The house keeps it, and someone else will come down eventually.');
+  const n=state.shots, name=ghost.type.name;
+  if(n>=PHOTO_GOAL)
+    showEnd('You got the pictures.','Three frames of '+name+' — '+ghost.type.tell+' — taken in '+ROOMS[ghost.home].name.toLowerCase()+
+      ' and carried up the stairs'+(state.best<3?' from close enough to touch':'')+'. Nobody will believe them, and you will not need them to.');
+  else if(n>0)
+    showEnd('You got out.',n===1?'One frame. It was '+name+' — '+ghost.type.tell+' — and one blurred shape is not proof of anything.'
+                               :'Two frames, one short. It was '+name+' — '+ghost.type.tell+' — and the roll ends with the stairs.');
   else
-    showEnd('You got out.','No name in the book. It was '+ghost.type.name+', living in '+ROOMS[ghost.home].name+', and it is still there.');
+    showEnd('You got out empty.','Not one frame. It was '+name+', living in '+ROOMS[ghost.home].name.toLowerCase()+', and it is still there.');
 }
 
 /* ---------------------------------------------------------- loop */
@@ -1191,7 +1070,7 @@ function animate(){
   requestAnimationFrame(animate);
   const dt=Math.min(clock.getDelta(),0.05); now+=dt;
 
-  if(state.started && !state.over && !journalOpen){
+  if(state.started && !state.over){
     // movement
     let mx=0,mz=0;
     if(keys.KeyW||keys.ArrowUp) mz-=1;
@@ -1239,6 +1118,7 @@ function animate(){
     ghost.obj.lookAt(player.pos.x,0,player.pos.z);
     ghost.light.position.set(ghost.pos.x,1.2,ghost.pos.z);
 
+    if(shotCool>0) shotCool-=dt;
     if(Math.floor(now*4)!==Math.floor((now-dt)*4)) readout();
 
     // exit
@@ -1279,15 +1159,19 @@ function animate(){
 /* ---------------------------------------------------------- start */
 document.getElementById('startBtn').onclick=()=>{
   audio.init();
+  document.getElementById('startBtn').blur();
   document.getElementById('title').style.display='none';
   document.getElementById('hud').style.display='block';
   state.started=true;
   setupTouch();
   if(!isTouch) lockNow();
-  say('Start with the reader. Walk every room until the number hits 4.',5);
+  say('Watch the signal. When it climbs, sweep the dark and shoot.',5);
 };
 init();
-document.addEventListener('click',()=>{ if(state.started&&!journalOpen&&!state.over&&!isTouch&&!locked) lockNow(); });
+document.addEventListener('click',()=>{
+  if(!state.started||state.over||isTouch) return;
+  if(locked) shoot(); else lockNow();
+});
 </script>
 </body>
 </html>
